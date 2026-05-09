@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "aws-amplify": "^6.17.0",
     "axios": "^1.13.4",
     "dayjs": "^1.11.20",
     "lucide-react": "^0.563.0",
@@ -21,9 +22,16 @@
     "react-tailwindcss-datepicker": "^2.0.0"
   },
   "devDependencies": {
+    "@aws-amplify/backend": "^1.22.0",
+    "@aws-amplify/backend-cli": "^1.8.2",
     "@tailwindcss/postcss": "^4",
+    "aws-cdk-lib": "^2.234.1",
+    "constructs": "^10.6.0",
+    "esbuild": "^0.28.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
