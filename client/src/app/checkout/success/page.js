@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 // Confetti needs to be client-side only
 const Confetti = dynamic(() => import('react-confetti'), { ssr: false });
 
-export default function PaymentSuccess() {
+function PaymentSuccessContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const bookingId = searchParams.get('bookingId');
@@ -65,5 +65,13 @@ export default function PaymentSuccess() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function PaymentSuccess() {
+    return (
+        <React.Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+            <PaymentSuccessContent />
+        </React.Suspense>
     );
 }
