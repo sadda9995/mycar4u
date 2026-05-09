@@ -1,0 +1,33 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "html-pdf-node": "^1.0.8",
+    "json2csv": "^5.0.7",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.5",
+    "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.10.1",
+    "otp-generator": "^4.0.1",
+    "pdfkit": "^0.18.0",
+    "razorpay": "^2.9.6",
+    "resend": "^6.12.2"
+  }
+}
