@@ -32,7 +32,7 @@ export default function SplashScreen() {
             style={{ opacity: opacity }}
         >
             <div className="animate-bounce">
-                <Car className="h-16 w-16 text-red-600 mb-4" />
+                <img src="/favicon.png" alt="Logo" className="h-20 w-20 object-contain mb-4" />
             </div>
             <h1 className="text-3xl font-bold text-white tracking-widest animate-pulse">
                 Mycar4u

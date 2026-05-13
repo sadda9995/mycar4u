@@ -118,7 +118,7 @@ function CarsContent() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center cursor-pointer" onClick={() => router.push('/')}>
-              <Car className="h-8 w-8 text-red-600" />
+              <img src="/favicon.png" alt="Logo" className="h-8 w-8 object-contain" />
               <span className="ml-2 text-2xl font-bold tracking-tight text-white">Mycar4u</span>
             </div>
 

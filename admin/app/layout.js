@@ -76,8 +76,13 @@ export default function RootLayout({ children }) {
     // Loading state content
     if ((!isAuthorized || !isAdmin) && pathname !== '/login') {
         return (
-            <html lang="en">
-                <body className="bg-black text-white antialiased flex items-center justify-center h-screen">
+        <html lang="en">
+            <head>
+                <title>Mycar4u Admin Dashboard</title>
+                <link rel="icon" href="/favicon.png" />
+                <meta name="description" content="Manage your premium car rental fleet with Mycar4u." />
+            </head>
+            <body className="bg-black text-white antialiased flex items-center justify-center h-screen">
                     <div className="animate-pulse flex flex-col items-center">
                         <Car className="h-10 w-10 text-red-600 mb-4" />
                         <p className="text-gray-400">Loading...</p>
@@ -89,6 +94,11 @@ export default function RootLayout({ children }) {
 
     return (
         <html lang="en">
+            <head>
+                <title>Mycar4u Admin Dashboard</title>
+                <link rel="icon" href="/favicon.png" />
+                <meta name="description" content="Manage your premium car rental fleet with Mycar4u." />
+            </head>
             <body className="bg-black text-white antialiased">
                 <div className="flex h-screen overflow-hidden">
 
@@ -98,7 +108,7 @@ export default function RootLayout({ children }) {
                             <div className="h-full flex flex-col">
                                 {/* Logo */}
                                 <div className="h-16 flex items-center px-6 border-b border-white/10">
-                                    <Car className="h-6 w-6 text-red-600 mr-2" />
+                                    <img src="/favicon.png" alt="Logo" className="h-8 w-8 object-contain mr-3" />
                                     <span className="text-xl font-bold tracking-tight">Admin<span className="text-red-600">Panel</span></span>
                                 </div>
 
