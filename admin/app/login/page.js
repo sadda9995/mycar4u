@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Car, ArrowRight, Lock, User, Mail } from 'lucide-react';
 import api from '@/lib/api';
 
-export default function Login() {
+function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [username, setUsername] = useState('');
@@ -204,5 +204,17 @@ export default function Login() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function Login() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-black flex items-center justify-center p-4">
+                <div className="text-white text-xl animate-pulse">Loading...</div>
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }
