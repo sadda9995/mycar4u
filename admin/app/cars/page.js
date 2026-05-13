@@ -38,9 +38,11 @@ export default function Fleet() {
             if (filters.type !== 'all') query += `type=${filters.type}&`;
 
             const res = await api.get(query);
-            setCars(res.data);
+            // The API returns { cars: [], total: 0, ... }
+            setCars(res.data.cars || res.data || []);
         } catch (error) {
             console.error('Error fetching cars:', error);
+            setCars([]);
         } finally {
             setLoading(false);
         }
@@ -148,7 +150,7 @@ export default function Fleet() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cars.map(car => (
+                {Array.isArray(cars) && cars.map(car => (
                     <div key={car._id} className="bg-zinc-900/50 border border-white/5 rounded-2xl overflow-hidden hover:border-white/20 transition group">
                         <div className="h-48 bg-zinc-800 flex items-center justify-center relative">
                             {car.image && car.image.length > 0 ? (
