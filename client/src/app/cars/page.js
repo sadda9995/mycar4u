@@ -265,10 +265,15 @@ function CarsContent() {
                     className="group bg-zinc-900/30 border border-white/5 rounded-3xl overflow-hidden hover:border-red-600/40 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-500 flex flex-col"
                   >
                     <div className="h-48 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
-                      <Car className="h-20 w-20 text-zinc-700 group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white border border-white/10">
-                        {car.transmission}
-                      </div>
+                      {car.image && car.image.length > 0 ? (
+                        <img 
+                          src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
+                          alt={car.model} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition duration-700" 
+                        />
+                      ) : (
+                        <Car className="h-20 w-20 text-zinc-700 group-hover:scale-110 transition-transform duration-700" />
+                      )}
                       <div className="absolute bottom-4 left-4 flex gap-1">
                         <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded lowercase">
                           {car.type}

@@ -154,7 +154,11 @@ export default function Fleet() {
                     <div key={car._id} className="bg-zinc-900/50 border border-white/5 rounded-2xl overflow-hidden hover:border-white/20 transition group">
                         <div className="h-48 bg-zinc-800 flex items-center justify-center relative">
                             {car.image && car.image.length > 0 ? (
-                                <img src={car.image[0]} alt={car.model} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                                <img 
+                                    src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
+                                    alt={car.model} 
+                                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
+                                />
                             ) : (
                                 <Car className="h-16 w-16 text-zinc-600 group-hover:scale-110 transition duration-500" />
                             )}
