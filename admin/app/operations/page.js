@@ -82,21 +82,15 @@ function OutwardForm({ showToast }) {
     };
 
     const uploadToCloudinary = async (file) => {
-        const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-        const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-        if (!preset || !cloud) {
-            alert('Cloudinary env vars missing: set NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET and NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME');
+        const data = new FormData();
+        data.append('image', file);
+        try {
+            const res = await api.post('/upload', data);
+            return res.data.filePath;
+        } catch (err) {
+            console.error('Upload failed', err);
             return null;
         }
-        const data = new FormData();
-        data.append('file', file);
-        data.append('upload_preset', preset);
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/upload`, {
-            method: 'POST',
-            body: data
-        });
-        const json = await res.json();
-        return json.secure_url;
     };
 
     return (

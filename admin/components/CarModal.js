@@ -582,16 +582,14 @@ export default function CarModal({ isOpen, onClose, onSave, car }) {
                                             data.append('image', file);
 
                                             try {
-                                                const res = await api.post('/upload', data, {
-                                                    headers: { 'Content-Type': 'multipart/form-data' }
-                                                });
-                                                const base = api.defaults.baseURL.replace('/api', '');
+                                                const res = await api.post('/upload', data);
                                                 if (res.data.filePath) {
-                                                    setFormData(prev => ({ ...prev, image: `${base}${res.data.filePath}` }));
+                                                    setFormData(prev => ({ ...prev, image: res.data.filePath }));
                                                 }
                                             } catch (err) {
                                                 console.error('Upload failed', err);
-                                                alert('Image upload failed');
+                                                const errorMsg = err.response?.data?.message || err.message || 'Unknown error';
+                                                alert('Image upload failed: ' + errorMsg);
                                             }
                                         }}
                                     />
