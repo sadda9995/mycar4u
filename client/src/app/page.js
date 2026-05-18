@@ -296,7 +296,15 @@ export default function Home() {
                 <div key={car._id} className="group bg-zinc-900/30 border border-white/5 rounded-2xl overflow-hidden hover:border-red-600/40 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-300 flex flex-col">
                   {/* Image Area */}
                   <div className="h-48 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
-                    <Car className="h-20 w-20 text-zinc-700 group-hover:scale-110 transition-transform duration-500" />
+                    {car.image && car.image.length > 0 ? (
+                      <img 
+                        src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
+                        alt={car.model} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
+                      />
+                    ) : (
+                      <Car className="h-20 w-20 text-zinc-700 group-hover:scale-110 transition-transform duration-500" />
+                    )}
                     <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/10 shadow-lg">
                       {car.transmission}
                     </div>
