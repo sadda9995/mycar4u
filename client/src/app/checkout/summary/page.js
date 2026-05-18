@@ -243,8 +243,16 @@ function BookingSummaryContent() {
                 <div className="md:col-span-2 space-y-6">
                     {/* Car Info */}
                     <div className="bg-zinc-900/50 border border-white/10 p-6 rounded-2xl flex items-start space-x-4">
-                        <div className="h-24 w-32 bg-zinc-800 rounded-xl flex items-center justify-center">
-                            <Car className="h-10 w-10 text-gray-500" />
+                        <div className="h-24 w-32 bg-zinc-800 rounded-xl overflow-hidden flex items-center justify-center relative">
+                            {car.image && car.image.length > 0 ? (
+                                <img 
+                                    src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
+                                    alt={car.model} 
+                                    className="w-full h-full object-cover" 
+                                />
+                            ) : (
+                                <Car className="h-10 w-10 text-gray-500" />
+                            )}
                         </div>
                         <div>
                             <h2 className="text-xl font-bold">{car.make} {car.model}</h2>

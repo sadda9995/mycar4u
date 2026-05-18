@@ -72,8 +72,16 @@ export default function MyBookings() {
                             <div key={booking._id} className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 hover:border-white/10 transition group">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-start space-x-4">
-                                        <div className="h-16 w-16 bg-zinc-800 rounded-lg flex items-center justify-center">
-                                            <Car className="h-8 w-8 text-gray-500" />
+                                        <div className="h-16 w-16 bg-zinc-800 rounded-lg overflow-hidden flex items-center justify-center relative">
+                                            {booking.car.image && booking.car.image.length > 0 ? (
+                                                <img 
+                                                    src={booking.car.image[0].startsWith('http') ? booking.car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${booking.car.image[0]}`} 
+                                                    alt={booking.car.model} 
+                                                    className="w-full h-full object-cover" 
+                                                />
+                                            ) : (
+                                                <Car className="h-8 w-8 text-gray-500" />
+                                            )}
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-lg">{booking.car.make} {booking.car.model}</h3>

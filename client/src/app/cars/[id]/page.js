@@ -135,7 +135,15 @@ export default function CarDetails() {
                 <div className="lg:col-span-2 space-y-8">
                     {/* Image Area */}
                     <div className="bg-zinc-900 rounded-2xl overflow-hidden border border-white/10 aspect-video flex items-center justify-center relative group">
-                        <Car className="h-32 w-32 text-zinc-700 group-hover:scale-110 transition duration-700" />
+                        {car.image && car.image.length > 0 ? (
+                            <img 
+                                src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
+                                alt={car.model} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition duration-700" 
+                            />
+                        ) : (
+                            <Car className="h-32 w-32 text-zinc-700 group-hover:scale-110 transition duration-700" />
+                        )}
                     </div>
 
                     {/* Key Stats */}
