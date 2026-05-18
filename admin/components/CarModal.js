@@ -582,7 +582,9 @@ export default function CarModal({ isOpen, onClose, onSave, car }) {
                                             data.append('image', file);
 
                                             try {
-                                                const res = await api.post('/upload', data);
+                                                const res = await api.post('/upload', data, {
+                                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                                });
                                                 if (res.data.filePath) {
                                                     setFormData(prev => ({ ...prev, image: res.data.filePath }));
                                                 }

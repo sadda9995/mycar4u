@@ -85,7 +85,9 @@ function OutwardForm({ showToast }) {
         const data = new FormData();
         data.append('image', file);
         try {
-            const res = await api.post('/upload', data);
+            const res = await api.post('/upload', data, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             return res.data.filePath;
         } catch (err) {
             console.error('Upload failed', err);
