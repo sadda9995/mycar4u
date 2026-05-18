@@ -459,14 +459,28 @@ export default function Home() {
               Premium car rental service designed for the modern traveler. Comfort, Safety, and Style.
             </p>
           </div>
-          {['Company', 'Support', 'Legal'].map((head) => (
-            <div key={head}>
-              <h3 className="font-bold text-white mb-4">{head}</h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                {['About', 'Careers', 'Contact'].map(i => <li key={i} className="hover:text-red-500 cursor-pointer">{i}</li>)}
-              </ul>
-            </div>
-          ))}
+          <div>
+            <h3 className="font-bold text-white mb-4">Company</h3>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li className="hover:text-red-500 cursor-pointer"><a href="/#fleet">About</a></li>
+              <li className="hover:text-red-500 cursor-pointer">Careers</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold text-white mb-4">Support</h3>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li className="hover:text-red-500 cursor-pointer"><a href="/contact">Contact Us</a></li>
+              <li className="hover:text-red-500 cursor-pointer"><a href="/contact">FAQ</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold text-white mb-4">Legal</h3>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li className="hover:text-red-500 cursor-pointer"><a href="/terms-and-conditions">Terms & Conditions</a></li>
+              <li className="hover:text-red-500 cursor-pointer"><a href="/privacy-policy">Privacy Policy</a></li>
+              <li className="hover:text-red-500 cursor-pointer"><a href="/refund-and-cancellation">Refund & Cancellation</a></li>
+            </ul>
+          </div>
         </div>
       </footer>
     </div>
