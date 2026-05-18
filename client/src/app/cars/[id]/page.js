@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import api from '@/utils/api';
+import Header from '@/components/Header';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
@@ -11,14 +12,22 @@ import {
     MoveHorizontal, Cog
 } from 'lucide-react';
 
-export default function CarDetails() {
+function CarDetailsContent() {
     const { id } = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    
+    const startParam = searchParams.get('start');
+    const endParam = searchParams.get('end');
+
     const [car, setCar] = useState(null);
     const [user, setUser] = useState(null);
-    const [bookingDates, setBookingDates] = useState({ start: '', end: '' });
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [bookingDates, setBookingDates] = useState({ 
+        start: startParam || '', 
+        end: endParam || '' 
+    });
+    const [startDate, setStartDate] = useState(startParam ? new Date(startParam) : null);
+    const [endDate, setEndDate] = useState(endParam ? new Date(endParam) : null);
 
     const isSameDay = (a, b) => a && b && a.toDateString() === b.toDateString();
     const startOfDay = (d) => {
@@ -123,13 +132,7 @@ export default function CarDetails() {
 
     return (
         <div className="min-h-screen bg-black text-white font-sans pb-24 md:pb-0">
-            <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-md border-b border-white/10 px-4 h-16 flex items-center justify-between">
-                <button onClick={() => router.back()} className="flex items-center text-gray-400 hover:text-white transition">
-                    <ArrowLeft className="h-5 w-5 mr-2" /> <span className="hidden sm:inline">Back</span>
-                </button>
-                <div className="font-bold text-lg">{car.make} {car.model}</div>
-                <div className="w-10"></div>
-            </div>
+            <Header />
 
             <main className="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
@@ -139,10 +142,10 @@ export default function CarDetails() {
                             <img 
                                 src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
                                 alt={car.model} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition duration-700" 
+                                className="w-full h-full object-cover" 
                             />
                         ) : (
-                            <Car className="h-32 w-32 text-zinc-700 group-hover:scale-110 transition duration-700" />
+                            <Car className="h-32 w-32 text-zinc-700" />
                         )}
                     </div>
 
@@ -285,7 +288,7 @@ export default function CarDetails() {
                 </div>
 
                 {/* Sticky Booking Widget */}
-                <div className="hidden lg:block">
+                <div id="booking-widget" className="mt-8 lg:mt-0">
                     <div className="sticky top-24 bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-2xl">
                         <div className="flex justify-between items-end mb-6">
                             <div>
@@ -387,7 +390,7 @@ export default function CarDetails() {
                             onClick={handleBook}
                             disabled={!priceEstimate || !!dateError || (car.maintenanceWindows?.length > 0)}
                             className={`w-full py-4 rounded-xl text-lg font-bold transition-all ${priceEstimate && !dateError && !(car.maintenanceWindows?.length > 0)
-                                ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-900/20'
+                                ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-900/20 cursor-pointer'
                                 : 'bg-zinc-800 text-gray-500 cursor-not-allowed'
                                 }`}
                         >
@@ -411,14 +414,24 @@ export default function CarDetails() {
                     )}
                 </div>
                 {(!bookingDates.start || !bookingDates.end) ? (
-                    <div className="flex space-x-2">
-                        <input type="datetime-local" className="bg-zinc-800 text-white text-xs w-24 rounded p-1 border border-zinc-700" onChange={(e) => setBookingDates({ ...bookingDates, start: e.target.value })} />
-                        <input type="datetime-local" className="bg-zinc-800 text-white text-xs w-24 rounded p-1 border border-zinc-700" onChange={(e) => setBookingDates({ ...bookingDates, end: e.target.value })} />
-                    </div>
+                    <button 
+                        onClick={() => document.getElementById('booking-widget')?.scrollIntoView({ behavior: 'smooth' })} 
+                        className="bg-white text-black px-6 py-3 rounded-xl font-bold shadow-xl cursor-pointer hover:bg-gray-200 transition-colors"
+                    >
+                        Select Dates
+                    </button>
                 ) : (
                     <button onClick={handleBook} className="bg-red-600 px-8 py-3 rounded-xl font-bold text-white">Book Now</button>
                 )}
             </div>
         </div>
+    );
+}
+
+export default function CarDetails() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-600"></div></div>}>
+            <CarDetailsContent />
+        </Suspense>
     );
 }

@@ -2,8 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, Car, Calendar, MapPin, Search, Star, Zap, Shield, Clock, Menu, X, Settings } from 'lucide-react';
+import { LogOut, Car, Calendar, MapPin, Search, Star, Zap, Shield, Clock, Menu, X, Settings, Smartphone, Key, ThumbsUp, CheckCircle, Quote, Compass, Sparkles } from 'lucide-react';
 import api from '@/utils/api';
+import Header from '@/components/Header';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function Home() {
   const router = useRouter();
@@ -15,10 +18,8 @@ export default function Home() {
   const [location, setLocation] = useState('');
   const [cities, setCities] = useState([]);
   const [showCityModal, setShowCityModal] = useState(false);
-  const [dates, setDates] = useState({
-    start: '',
-    end: ''
-  });
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function Home() {
 
   const fetchCars = async (cityName = location) => {
     try {
-      let url = '/cars?limit=10';
+      let url = '/cars?limit=6';
       if (cityName) url += `&city=${encodeURIComponent(cityName)}`;
       const res = await api.get(url);
       setCars(res.data.cars || []);
@@ -77,86 +78,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-red-900 selection:text-white">
       {/* Navbar */}
-      {/* Navbar */}
-      <nav className={`absolute top-0 w-full z-50 transition-all duration-300 ${isMobileMenuOpen ? 'bg-black' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
-            <div className="flex items-center cursor-pointer" onClick={() => router.push('/')}>
-              <img src="/favicon.png" alt="Mycar4u Logo" className="h-10 w-10 object-contain" />
-              <span className="ml-2 text-2xl font-bold tracking-tight text-white">Mycar4u</span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-6">
-              <button onClick={() => router.push('/')} className="text-gray-300 hover:text-white text-sm font-medium transition">Home</button>
-              <button onClick={() => router.push('/cars')} className="text-gray-300 hover:text-white text-sm font-medium transition">Fleet</button>
-              <button className="text-gray-300 hover:text-white text-sm font-medium transition">Offers</button>
-              {user ? (
-                <div className="flex items-center space-x-4 pl-6 border-l border-white/20">
-                  <span className="text-sm font-medium">{user.name || user.mobile}</span>
-                  <button
-                    onClick={() => router.push('/bookings')}
-                    className="text-sm text-gray-300 hover:text-white transition"
-                  >
-                    My Bookings
-                  </button>
-                  <button onClick={() => router.push('/settings')} className="text-gray-400 hover:text-white transition">
-                    <Settings className="h-5 w-5" />
-                  </button>
-                  <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 transition">
-                    <LogOut className="h-5 w-5" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4 pl-6 border-l border-white/20">
-                  <button onClick={() => router.push('/login')} className="text-white font-medium hover:text-red-500 transition">Log In</button>
-                  <button
-                    onClick={() => router.push('/login')}
-                    className="bg-red-600 text-white px-5 py-2.5 rounded-full hover:bg-red-700 transition font-medium shadow-lg shadow-red-900/20"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white">
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 absolute w-full left-0 top-20 p-6 flex flex-col space-y-4 shadow-2xl">
-            <button onClick={() => router.push('/')} className="text-left text-lg font-medium text-white py-2 border-b border-white/10">Home</button>
-            <button onClick={() => router.push('/cars')} className="text-left text-lg font-medium text-white py-2 border-b border-white/10">Fleet</button>
-            <button className="text-left text-lg font-medium text-white py-2 border-b border-white/10">Offers</button>
-            {user ? (
-              <>
-                <div className="py-2 flex items-center justify-between border-b border-white/10">
-                  <span className="text-lg font-medium text-gray-300">Hello, {user.name || user.mobile}</span>
-                </div>
-                <button onClick={() => router.push('/bookings')} className="text-left text-lg font-medium text-white py-2 border-b border-white/10">My Bookings</button>
-                <button onClick={() => router.push('/settings')} className="text-left text-lg font-medium text-white py-2 border-b border-white/10 flex items-center">
-                  <Settings className="h-5 w-5 mr-2" /> Settings
-                </button>
-                <button onClick={handleLogout} className="text-left text-lg font-medium text-red-500 py-2 flex items-center">
-                  <LogOut className="h-5 w-5 mr-2" /> Log Out
-                </button>
-              </>
-            ) : (
-              <div className="flex flex-col space-y-4 pt-2">
-                <button onClick={() => router.push('/login')} className="w-full bg-zinc-800 text-white py-3 rounded-xl font-bold">Log In</button>
-                <button onClick={() => router.push('/login')} className="w-full bg-red-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-red-900/20">Sign Up</button>
-              </div>
-            )}
-          </div>
-        )}
-      </nav>
+      <Header />
 
       {/* Hero Section */}
       <div className="relative min-h-[600px] h-auto md:h-[600px] flex flex-col pt-24 pb-12 md:pt-0 md:pb-0 md:justify-center items-center overflow-hidden">
@@ -172,10 +94,10 @@ export default function Home() {
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col items-center text-center">
           <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-4 md:mb-6 leading-tight">
-            Drive the <span className="text-red-600">Extraordinary</span>
+            Your Journey, Your <span className="text-red-600">Self-Drive</span> Freedom
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 mb-8 md:mb-10 max-w-2xl px-4">
-            Premium car rentals for every journey. From city streets to mountain peaks, find your perfect ride today.
+          <p className="text-lg md:text-xl text-gray-300 mb-8 md:mb-10 max-w-3xl px-4">
+            From daily city commutes and family weekend road trips to premium corporate travel. Rent any car—from economical hatchbacks to luxury SUVs—100% online with low, fully refundable security deposits.
           </p>
 
           {/* Search Widget */}
@@ -198,21 +120,38 @@ export default function Home() {
               </select>
             </div>
 
-            <div className="flex-1 bg-black/40 rounded-xl px-4 py-3 border border-white/5 hover:border-white/20 transition">
+            <div className="flex-1 bg-black/40 rounded-xl px-4 py-3 border border-white/5 hover:border-white/20 transition cursor-pointer">
               <label className="block text-xs text-gray-400 mb-1 flex items-center"><Calendar className="h-3 w-3 mr-1" /> Start Date</label>
-              <input
-                type="datetime-local"
-                className="w-full bg-transparent text-white outline-none font-medium appearance-none [&::-webkit-calendar-picker-indicator]:invert"
-                onChange={(e) => setDates({ ...dates, start: e.target.value })}
+              <DatePicker
+                  selected={startDate}
+                  onChange={(date) => {
+                      setStartDate(date);
+                      if (date && endDate && endDate < date) setEndDate(null);
+                  }}
+                  showTimeSelect
+                  timeIntervals={30}
+                  minDate={new Date()}
+                  dateFormat="dd/MM/yyyy HH:mm"
+                  placeholderText="Start date & time"
+                  className="w-full bg-transparent text-white outline-none font-medium placeholder-gray-500 cursor-pointer"
+                  calendarClassName="bg-zinc-900 text-white border border-white/10 rounded-xl shadow-xl"
+                  dayClassName={() => 'text-white'}
               />
             </div>
 
-            <div className="flex-1 bg-black/40 rounded-xl px-4 py-3 border border-white/5 hover:border-white/20 transition">
+            <div className="flex-1 bg-black/40 rounded-xl px-4 py-3 border border-white/5 hover:border-white/20 transition cursor-pointer">
               <label className="block text-xs text-gray-400 mb-1 flex items-center"><Calendar className="h-3 w-3 mr-1" /> End Date</label>
-              <input
-                type="datetime-local"
-                className="w-full bg-transparent text-white outline-none font-medium appearance-none [&::-webkit-calendar-picker-indicator]:invert"
-                onChange={(e) => setDates({ ...dates, end: e.target.value })}
+              <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  showTimeSelect
+                  timeIntervals={30}
+                  minDate={startDate || new Date()}
+                  dateFormat="dd/MM/yyyy HH:mm"
+                  placeholderText="End date & time"
+                  className="w-full bg-transparent text-white outline-none font-medium placeholder-gray-500 cursor-pointer"
+                  calendarClassName="bg-zinc-900 text-white border border-white/10 rounded-xl shadow-xl"
+                  dayClassName={() => 'text-white'}
               />
             </div>
 
@@ -220,6 +159,8 @@ export default function Home() {
               onClick={() => {
                 const params = new URLSearchParams();
                 if (location) params.append('city', location);
+                if (startDate) params.append('start', startDate.toISOString());
+                if (endDate) params.append('end', endDate.toISOString());
                 router.push(`/cars?${params.toString()}`);
               }}
               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-bold text-lg flex items-center justify-center transition shadow-lg shadow-red-900/30"
@@ -252,9 +193,9 @@ export default function Home() {
         <section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: Shield, title: "Verified Cars", desc: "Every car is inspected for safety & hygiene." },
-              { icon: Zap, title: "Instant Booking", desc: "Book in 3 clicks. No waiting, no paperwork." },
-              { icon: Clock, title: "24/7 Support", desc: "Round-the-clock roadside assistance." }
+              { icon: Shield, title: "Sanitized & Reliable Fleet", desc: "Whether you choose a budget hatchback or a premium SUV, every car is deeply detailed, safety-checked, and serviced to factory standards." },
+              { icon: Zap, title: "Complete Self-Drive Privacy", desc: "No drivers, no hidden schedules. Enjoy complete privacy and the freedom to explore on your own terms. Your car, your rules." },
+              { icon: Clock, title: "Refundable Deposit & Clear Pricing", desc: "Experience 100% price transparency. Fully refundable security deposits, zero hidden charges, and clear billing with no sudden convenience fees." }
             ].map((f, i) => (
               <div key={i} className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 flex items-start space-x-4 hover:bg-zinc-900 transition duration-300">
                 <div className="bg-red-600/10 p-3 rounded-xl text-red-500">
@@ -269,12 +210,78 @@ export default function Home() {
           </div>
         </section>
 
+        {/* How It Works */}
+        <section id="how-it-works">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">How it <span className="text-red-600">Works</span></h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">Rent your perfect vehicle in three simple, fully digital steps. Our optimized platform gets you on the road faster.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            <div className="hidden md:block absolute top-1/2 left-[16.6%] right-[16.6%] h-0.5 bg-gradient-to-r from-red-600/0 via-red-600/50 to-red-600/0 -translate-y-1/2 z-0"></div>
+            {[
+              { icon: Smartphone, title: "1. Choose Your Match", desc: "Browse our diverse fleet of hatchbacks, sedans, SUVs, and premium models to find your perfect ride." },
+              { icon: Key, title: "2. Secure Digital Check-in", desc: "Securely upload your Driving License and ID on our web platform for quick, automated verification." },
+              { icon: ThumbsUp, title: "3. Doorstep Delivery & Go", desc: "Have the car delivered directly to your doorstep or pick it up from a nearby hub. Hit the road with 24/7 support." }
+            ].map((step, i) => (
+              <div key={i} className="relative z-10 flex flex-col items-center text-center">
+                <div className="h-20 w-20 bg-zinc-900 border-2 border-red-600/30 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(220,38,38,0.15)]">
+                  <step.icon className="h-8 w-8 text-red-500" />
+                </div>
+                <h3 className="font-bold text-xl text-white mb-2">{step.title}</h3>
+                <p className="text-gray-400 text-sm">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Browse by Category */}
+        <section>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">Browse by Category</h2>
+              <p className="text-gray-400">Find the perfect vehicle tailored for your daily commute, weekend getaways, or luxury business trips.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "SUVs", filter: "suv", image: "/categories/suv.png", glowColor: "from-blue-600/10 to-transparent", hoverBorder: "hover:border-blue-500/20" },
+              { title: "Luxury", filter: "luxury", image: "/categories/luxury.png", glowColor: "from-red-600/10 to-transparent", hoverBorder: "hover:border-red-500/20" },
+              { title: "Sedans", filter: "sedan", image: "/categories/sedan.png", glowColor: "from-purple-600/10 to-transparent", hoverBorder: "hover:border-purple-500/20" },
+              { title: "Hatchbacks", filter: "hatchback", image: "/categories/hatchback.png", glowColor: "from-yellow-600/10 to-transparent", hoverBorder: "hover:border-yellow-500/20" }
+            ].map((cat, i) => (
+              <button 
+                key={i}
+                onClick={() => router.push(`/cars?type=${cat.filter}`)}
+                className={`relative bg-zinc-900/30 border border-white/5 ${cat.hoverBorder} hover:bg-zinc-950/60 rounded-3xl p-6 h-64 flex flex-col items-center justify-between transition-all duration-500 group overflow-hidden cursor-pointer`}
+              >
+                {/* Background Glow */}
+                <div className={`absolute inset-0 bg-gradient-to-t ${cat.glowColor} opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0`}></div>
+                
+                {/* Image Wrapper with Float Effect */}
+                <div className="relative w-full h-36 flex items-center justify-center z-10 transition-all duration-500 group-hover:-translate-y-2 group-hover:scale-105">
+                  <img 
+                    src={cat.image} 
+                    alt={cat.title} 
+                    className="max-w-full max-h-full object-contain filter drop-shadow-[0_15px_15px_rgba(0,0,0,0.6)]"
+                  />
+                </div>
+
+                {/* Info Text */}
+                <div className="relative z-10 text-center w-full mt-2">
+                  <span className="font-black text-sm text-gray-400 group-hover:text-white transition duration-300 tracking-wider uppercase">{cat.title}</span>
+                  <div className="h-0.5 w-8 bg-red-600 mx-auto mt-2 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* 2. Premium Fleet (Car Grid) */}
         <section id="fleet">
           <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
             <div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">Premium Fleet</h2>
-              <p className="text-gray-400">Choose from our curated collection of luxury and sport vehicles.</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">Our Self-Drive Fleet</h2>
+              <p className="text-gray-400">Hand-selected, immaculate vehicles for every budget, passenger count, and road condition.</p>
             </div>
             <div className="flex overflow-x-auto pb-2 md:pb-0 space-x-2 w-full md:w-auto no-scrollbar">
               <button 
@@ -293,17 +300,24 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {cars.map((car) => (
-                <div key={car._id} className="group bg-zinc-900/30 border border-white/5 rounded-2xl overflow-hidden hover:border-red-600/40 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-300 flex flex-col">
+                <div 
+                  key={car._id} 
+                  onClick={() => {
+                    const url = `/cars/${car._id}${startDate && endDate ? `?start=${startDate.toISOString()}&end=${endDate.toISOString()}` : ''}`;
+                    router.push(url);
+                  }} 
+                  className="group bg-zinc-900/30 border border-white/5 rounded-2xl overflow-hidden hover:border-red-600/40 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-300 flex flex-col cursor-pointer"
+                >
                   {/* Image Area */}
                   <div className="h-48 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
                     {car.image && car.image.length > 0 ? (
                       <img 
                         src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
                         alt={car.model} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
+                        className="w-full h-full object-cover" 
                       />
                     ) : (
-                      <Car className="h-20 w-20 text-zinc-700 group-hover:scale-110 transition-transform duration-500" />
+                      <Car className="h-20 w-20 text-zinc-700" />
                     )}
                     <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/10 shadow-lg">
                       {car.transmission}
@@ -333,8 +347,12 @@ export default function Home() {
                         <span className="text-gray-500 text-xs ml-1 font-medium">/ day</span>
                       </div>
                       <button
-                        onClick={() => router.push(`/cars/${car._id}`)}
-                        className="bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-red-600 hover:text-white transition-colors shadow-lg"
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          const url = `/cars/${car._id}${startDate && endDate ? `?start=${startDate.toISOString()}&end=${endDate.toISOString()}` : ''}`;
+                          router.push(url); 
+                        }}
+                        className="bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-red-600 hover:text-white transition-colors shadow-lg cursor-pointer"
                       >
                         Book Now
                       </button>
@@ -346,43 +364,19 @@ export default function Home() {
           )}
         </section>
 
-        {/* 3. How It Works */}
-        <section className="bg-zinc-900/20 rounded-3xl p-8 md:p-12 border border-white/5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
-          <div className="relative z-10 text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-            <p className="text-gray-400">Start your journey in minutes</p>
-          </div>
 
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { step: "01", title: "Choose Your Car", desc: "Select from our range of premium vehicles." },
-              { step: "02", title: "Book & Pay", desc: "Select dates and pay securely online." },
-              { step: "03", title: "Zoom Away", desc: "Pick up your car and enjoy the ride." }
-            ].map((s, i) => (
-              <div key={i} className="text-center relative">
-                <div className="text-6xl font-black text-white/5 absolute -top-8 left-1/2 -translate-x-1/2">{s.step}</div>
-                <div className="relative w-16 h-16 bg-gradient-to-br from-red-600 to-red-900 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-red-900/20 text-xl font-bold">
-                  {i + 1}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{s.title}</h3>
-                <p className="text-gray-500 text-sm max-w-xs mx-auto">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
 
         {/* 4. Testimonials */}
         <section>
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Loved by Thousands</h2>
-            <p className="text-gray-400">Don't just take our word for it.</p>
+            <h2 className="text-3xl font-bold mb-4">The Driver's Circle</h2>
+            <p className="text-gray-400">What our self-drive community says about the Mycar4u experience.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { name: "Arjun K.", role: "Road Tripper", text: "The car was in mint condition. The booking process was seamless. Highly recommended!" },
-              { name: "Sarah M.", role: "Daily Commuter", text: "Best rental service in Bangalore. Customer support is super responsive." },
-              { name: "Rahul D.", role: "Business Traveler", text: "Premium cars at affordable rates. Will definitely book again for my next trip." }
+              { name: "Arjun K.", role: "Office Commuter", text: "I rented a compact hatchback for my daily office commute while my personal vehicle was in the workshop. Super affordable, spotless, and incredibly fuel-efficient." },
+              { name: "Sarah M.", role: "Family Explorer", text: "Booked a spacious 7-seater SUV for a weekend family road trip. The doorstep delivery was precisely on time, and the ride was exceptionally smooth." },
+              { name: "Rahul D.", role: "Startup Founder", text: "Needed a premium sedan for an important corporate client meeting. Booked it in under 2 minutes. The online check-in is absolute magic." }
             ].map((t, i) => (
               <div key={i} className="bg-zinc-900/30 p-8 rounded-2xl border border-white/5 relative">
                 <div className="flex text-yellow-500 mb-4">
@@ -404,23 +398,40 @@ export default function Home() {
         </section>
 
         {/* 5. CTA Banner */}
-        <section className="bg-gradient-to-r from-red-900 to-black rounded-3xl p-12 text-center md:text-left flex flex-col md:flex-row items-center justify-between border border-white/10">
-          <div className="max-w-xl mb-8 md:mb-0">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ready to hit the road?</h2>
-            <p className="text-red-100 text-lg mb-8">Download our app for exclusive deals and faster bookings.</p>
+        <section className="relative bg-gradient-to-br from-zinc-900 to-black rounded-3xl p-8 md:p-12 text-center md:text-left flex flex-col md:flex-row items-center justify-between border border-white/10 overflow-hidden group">
+          {/* Ambient Red Glow */}
+          <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-red-600/10 rounded-full filter blur-[80px] pointer-events-none z-0"></div>
+          
+          <div className="max-w-xl mb-8 md:mb-0 relative z-10">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-white">Ready to take the wheel?</h2>
+            <p className="text-gray-300 text-base md:text-lg mb-8 max-w-lg leading-relaxed">
+              From quick daily errands to extraordinary interstate journeys, your perfect self-drive car is waiting. Book your next ride 100% digitally today.
+            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <button className="bg-white text-black px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition flex items-center justify-center">
-                Download App
+              <button 
+                onClick={() => router.push('/cars')}
+                className="bg-white text-black px-8 py-4 rounded-xl font-black text-sm hover:bg-red-600 hover:text-white transition-all shadow-lg hover:shadow-red-900/30 cursor-pointer"
+              >
+                Browse Cars
               </button>
-              <button className="border border-white/30 text-white px-8 py-3 rounded-xl font-bold hover:bg-white/10 transition">
-                View Offers
+              <button 
+                onClick={() => {
+                  document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="border border-white/20 text-white px-8 py-4 rounded-xl font-bold text-sm hover:bg-white/10 transition cursor-pointer"
+              >
+                How It Works
               </button>
             </div>
           </div>
 
-          {/* Decorative visual for App */}
-          <div className="relative w-64 h-64 bg-black/40 rounded-3xl border border-white/10 flex items-center justify-center rotate-3 transform hover:rotate-0 transition duration-500">
-            <span className="text-gray-500 font-mono text-sm">App Mockup</span>
+          {/* Decorative visual for Car */}
+          <div className="relative w-80 h-48 md:w-[400px] md:h-[220px] z-10 transform hover:scale-105 transition duration-700 flex items-center justify-center pointer-events-none">
+            <img 
+              src="/categories/luxury.png" 
+              alt="Luxury Sports Car Showcase" 
+              className="max-w-full max-h-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)]"
+            />
           </div>
         </section>
 

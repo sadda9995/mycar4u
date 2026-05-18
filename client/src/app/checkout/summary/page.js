@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import api from '@/utils/api';
+import Header from '@/components/Header';
 import { Car, ArrowLeft, Calendar, ShieldCheck, Info, CheckCircle } from 'lucide-react';
 
 function BookingSummaryContent() {
@@ -231,12 +232,7 @@ function BookingSummaryContent() {
 
     return (
         <div className="min-h-screen bg-black text-white font-sans pb-24 md:pb-0">
-            <nav className="sticky top-0 z-40 bg-zinc-900/80 backdrop-blur-md border-b border-white/10 px-4 h-16 flex items-center">
-                <button onClick={() => router.back()} className="mr-4 text-gray-400 hover:text-white transition">
-                    <ArrowLeft className="h-5 w-5" />
-                </button>
-                <h1 className="text-lg font-bold">Booking Summary</h1>
-            </nav>
+            <Header />
 
             <main className="max-w-4xl mx-auto p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Left: Summary Details */}
@@ -313,8 +309,8 @@ function BookingSummaryContent() {
                                 processing 
                                 ? 'bg-zinc-800 text-gray-500 cursor-not-allowed' 
                                 : paymentFailed 
-                                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-900/20' 
-                                    : 'bg-white text-black hover:bg-gray-100'
+                                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-900/20 cursor-pointer' 
+                                    : 'bg-white text-black hover:bg-gray-100 cursor-pointer'
                             }`}
                         >
                             {processing ? (

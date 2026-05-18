@@ -18,6 +18,7 @@ import {
   Settings
 } from 'lucide-react';
 import api from '@/utils/api';
+import Header from '@/components/Header';
 
 function CarsContent() {
   const router = useRouter();
@@ -31,10 +32,20 @@ function CarsContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
+  const getMappedType = (typeParam) => {
+    if (!typeParam) return 'all';
+    const lower = typeParam.toLowerCase();
+    if (lower === 'suv') return 'SUV';
+    if (lower === 'luxury') return 'Luxury';
+    if (lower === 'sedan') return 'Sedan';
+    if (lower === 'hatchback') return 'Hatchback';
+    return 'all';
+  };
+
   // Filter States
   const [filters, setFilters] = useState({
     city: searchParams.get('city') || '',
-    type: searchParams.get('type') || 'all',
+    type: getMappedType(searchParams.get('type')),
     fuelType: searchParams.get('fuelType') || 'all',
     search: searchParams.get('search') || '',
     status: 'available'
@@ -54,6 +65,21 @@ function CarsContent() {
     }
     fetchCities();
   }, []);
+
+  useEffect(() => {
+    const typeParam = searchParams.get('type');
+    const cityParam = searchParams.get('city');
+    const fuelTypeParam = searchParams.get('fuelType');
+    const searchParam = searchParams.get('search');
+    
+    setFilters(prev => ({
+      ...prev,
+      city: cityParam !== null ? cityParam : prev.city,
+      type: typeParam !== null ? getMappedType(typeParam) : prev.type,
+      fuelType: fuelTypeParam !== null ? fuelTypeParam : prev.fuelType,
+      search: searchParam !== null ? searchParam : prev.search
+    }));
+  }, [searchParams]);
 
   useEffect(() => {
     fetchCars();
@@ -113,48 +139,12 @@ function CarsContent() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-red-900 selection:text-white">
-      {/* Navbar (Same as Home) */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 backdrop-blur-md border-b border-white/10`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
-            <div className="flex items-center cursor-pointer" onClick={() => router.push('/')}>
-              <img src="/favicon.png" alt="Logo" className="h-8 w-8 object-contain" />
-              <span className="ml-2 text-2xl font-bold tracking-tight text-white">Mycar4u</span>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-6">
-              <button onClick={() => router.push('/')} className="text-gray-300 hover:text-white text-sm font-medium transition">Home</button>
-              <button onClick={() => router.push('/cars')} className="text-white text-sm font-medium transition underline underline-offset-8 decoration-red-600 decoration-2">Fleet</button>
-              {user ? (
-                <div className="flex items-center space-x-4 pl-6 border-l border-white/20">
-                  <span className="text-sm font-medium">{user.name || user.mobile}</span>
-                  <button onClick={() => router.push('/bookings')} className="text-sm text-gray-300 hover:text-white transition">My Bookings</button>
-                  <button onClick={() => router.push('/settings')} className="text-gray-400 hover:text-white transition">
-                    <Settings className="h-5 w-5" />
-                  </button>
-                  <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 transition"><LogOut className="h-5 w-5" /></button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4 pl-6 border-l border-white/20">
-                  <button onClick={() => router.push('/login')} className="text-white font-medium hover:text-red-500 transition">Log In</button>
-                  <button onClick={() => router.push('/login')} className="bg-red-600 text-white px-5 py-2.5 rounded-full hover:bg-red-700 transition font-medium">Sign Up</button>
-                </div>
-              )}
-            </div>
-
-            <div className="md:hidden flex items-center">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white">
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       {/* Hero / Header */}
       <div className="pt-24 pb-8 md:pt-32 md:pb-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-4">Explore Our <span className="text-red-600">Premium Fleet</span></h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-2 md:mb-4">Explore Our <span className="text-red-600">Premium Cars</span></h1>
           <p className="text-sm md:text-base text-gray-400 max-w-2xl">Find the perfect vehicle for your next adventure. From rugged SUVs to sleek sedans, we have it all.</p>
         </div>
       </div>
@@ -262,17 +252,23 @@ function CarsContent() {
                 {cars.map((car) => (
                   <div 
                     key={car._id} 
-                    className="group bg-zinc-900/30 border border-white/5 rounded-3xl overflow-hidden hover:border-red-600/40 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-500 flex flex-col"
+                    onClick={() => {
+                      const start = searchParams.get('start');
+                      const end = searchParams.get('end');
+                      const url = `/cars/${car._id}${start && end ? `?start=${start}&end=${end}` : ''}`;
+                      router.push(url);
+                    }}
+                    className="group bg-zinc-900/30 border border-white/5 rounded-3xl overflow-hidden hover:border-red-600/40 hover:shadow-2xl hover:shadow-red-900/10 transition-all duration-500 flex flex-col cursor-pointer"
                   >
                     <div className="h-48 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden">
                       {car.image && car.image.length > 0 ? (
                         <img 
                           src={car.image[0].startsWith('http') ? car.image[0] : `${process.env.NEXT_PUBLIC_API_URL || ''}${car.image[0]}`} 
                           alt={car.model} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition duration-700" 
+                          className="w-full h-full object-cover" 
                         />
                       ) : (
-                        <Car className="h-20 w-20 text-zinc-700 group-hover:scale-110 transition-transform duration-700" />
+                        <Car className="h-20 w-20 text-zinc-700" />
                       )}
                       <div className="absolute bottom-4 left-4 flex gap-1">
                         <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded lowercase">
@@ -305,8 +301,14 @@ function CarsContent() {
                           <span className="text-gray-500 text-[10px] ml-1 font-black uppercase">/ day</span>
                         </div>
                         <button 
-                          onClick={() => router.push(`/cars/${car._id}`)}
-                          className="bg-white text-black h-11 w-11 rounded-xl flex items-center justify-center hover:bg-red-600 hover:text-white transition-all shadow-xl shadow-white/5"
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            const start = searchParams.get('start');
+                            const end = searchParams.get('end');
+                            const url = `/cars/${car._id}${start && end ? `?start=${start}&end=${end}` : ''}`;
+                            router.push(url);
+                          }}
+                          className="bg-white text-black h-11 w-11 rounded-xl flex items-center justify-center hover:bg-red-600 hover:text-white transition-all shadow-xl shadow-white/5 cursor-pointer"
                         >
                           <ArrowRight className="h-5 w-5" />
                         </button>

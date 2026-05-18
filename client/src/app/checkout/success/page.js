@@ -48,7 +48,7 @@ function PaymentSuccessContent() {
 
                 <div className="space-y-3">
                     <button
-                        onClick={() => router.push('/bookings')}
+                        onClick={() => router.push('/settings?tab=bookings')}
                         className="w-full bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center shadow-lg shadow-green-900/20"
                     >
                         <Calendar className="mr-2 h-5 w-5" />

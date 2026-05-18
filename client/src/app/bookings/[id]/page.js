@@ -26,16 +26,13 @@ export default function RentalDetails() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        if (typeof window !== 'undefined' && !localStorage.getItem('token')) {
+            router.push('/login?redirectTo=/bookings/' + id);
+            return;
+        }
+
         const fetchBookingDetails = async () => {
             try {
-                // Since we don't have a direct "get by id" route that includes populated car data yet,
-                // we might need to rely on the user's booking history or add a specific endpoint.
-                // For now, let's try fetching the specific booking.
-                // IF backend doesn't support /bookings/:id, we might need to filter from my-bookings.
-                // Let's assume we added GET /bookings/:id to backend or will use logic to find it.
-
-                // Strategy: Fetch all my bookings and find the one. 
-                // (Better approach handles security if backend just returns list)
                 const res = await api.get('/bookings/my');
                 const found = res.data.find(b => b._id === id || b.bookingId === id);
 
@@ -45,8 +42,12 @@ export default function RentalDetails() {
                     setError('Booking not found');
                 }
             } catch (err) {
-                console.error(err);
-                setError('Failed to load booking details');
+                if (err.response?.status === 401) {
+                    router.push('/login?redirectTo=/bookings/' + id);
+                } else {
+                    console.error(err);
+                    setError('Failed to load booking details');
+                }
             } finally {
                 setLoading(false);
             }
@@ -66,7 +67,7 @@ export default function RentalDetails() {
             <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
             <h2 className="text-xl font-bold mb-2">Unavailable</h2>
             <p className="text-gray-400 mb-6">{error || 'Booking details not found.'}</p>
-            <button onClick={() => router.push('/bookings')} className="bg-white/10 px-6 py-2 rounded-lg hover:bg-white/20 transition">
+            <button onClick={() => router.push('/settings?tab=bookings')} className="bg-white/10 px-6 py-2 rounded-lg hover:bg-white/20 transition">
                 Back to Bookings
             </button>
         </div>
@@ -111,27 +112,33 @@ export default function RentalDetails() {
                 <section className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6 relative overflow-hidden">
                     <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between relative z-10">
                         <div>
-                            <h2 className="text-2xl font-bold mb-1">{booking.car.make} {booking.car.model}</h2>
-                            <p className="text-gray-400 font-mono text-sm mb-4">{booking.car.registrationNumber}</p>
-                            <div className="flex flex-wrap gap-2">
-                                <span className="text-xs bg-black/50 border border-white/10 px-2 py-1 rounded text-gray-300">
-                                    {booking.car.fuelType}
-                                </span>
-                                <span className="text-xs bg-black/50 border border-white/10 px-2 py-1 rounded text-gray-300">
-                                    {booking.car.transmission}
-                                </span>
-                                <span className="text-xs bg-black/50 border border-white/10 px-2 py-1 rounded text-gray-300">
-                                    {booking.car.seats} Seats
-                                </span>
+                            <h2 className="text-2xl font-bold mb-1">{booking.car ? `${booking.car.make} ${booking.car.model}` : 'Unknown Car'}</h2>
+                            {booking.car?.registrationNumber && (
+                                <p className="text-gray-400 font-mono text-sm mb-4">{booking.car.registrationNumber}</p>
+                            )}
+                            {booking.car && (
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="text-xs bg-black/50 border border-white/10 px-2 py-1 rounded text-gray-300">
+                                        {booking.car.fuelType}
+                                    </span>
+                                    <span className="text-xs bg-black/50 border border-white/10 px-2 py-1 rounded text-gray-300">
+                                        {booking.car.transmission}
+                                    </span>
+                                    <span className="text-xs bg-black/50 border border-white/10 px-2 py-1 rounded text-gray-300">
+                                        {booking.car.seats} Seats
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                        {booking.car?.image && (
+                            <div className="mt-6 md:mt-0">
+                                <img
+                                    src={booking.car.image}
+                                    alt={booking.car.model}
+                                    className="w-48 h-auto object-cover rounded-lg shadow-xl"
+                                />
                             </div>
-                        </div>
-                        <div className="mt-6 md:mt-0">
-                            <img
-                                src={booking.car.image}
-                                alt={booking.car.model}
-                                className="w-48 h-auto object-cover rounded-lg shadow-xl"
-                            />
-                        </div>
+                        )}
                     </div>
                     {/* Background decoration */}
                     <Car className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5 pointer-events-none" />
@@ -149,7 +156,7 @@ export default function RentalDetails() {
                                 <p className="text-lg font-bold">{formatDate(booking.startTime)}</p>
                                 <p className="text-sm text-gray-400 mt-1 flex items-center">
                                     <MapPin className="h-3 w-3 mr-1" />
-                                    {booking.car.location || 'Bangalore Center'}
+                                    {booking.car?.location || 'Bangalore Center'}
                                 </p>
                             </div>
                         </div>
@@ -162,7 +169,7 @@ export default function RentalDetails() {
                                 <p className="text-lg font-bold">{formatDate(booking.endTime)}</p>
                                 <p className="text-sm text-gray-400 mt-1 flex items-center">
                                     <MapPin className="h-3 w-3 mr-1" />
-                                    {booking.car.location || 'Bangalore Center'}
+                                    {booking.car?.location || 'Bangalore Center'}
                                 </p>
                             </div>
                         </div>
@@ -196,19 +203,34 @@ export default function RentalDetails() {
 
                 {/* Actions Grid */}
                 <section className="grid grid-cols-2 gap-4">
-                    <button className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition">
+                    <button 
+                        onClick={() => {
+                            const text = `Hello! I want to report an issue with my booking (ID: ${booking.bookingId}) for the ${booking.car ? `${booking.car.make} ${booking.car.model}` : 'vehicle'}.`;
+                            window.open(`https://wa.me/919876543210?text=${encodeURIComponent(text)}`, '_blank');
+                        }}
+                        className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition cursor-pointer"
+                    >
                         <AlertTriangle className="h-6 w-6 text-yellow-500 mb-2" />
                         <span className="text-sm font-bold">Report Issue</span>
                     </button>
-                    <button className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition">
+                    <button 
+                        onClick={() => {
+                            const text = `Hello! I would like to request a trip extension for my booking (ID: ${booking.bookingId}) for the ${booking.car ? `${booking.car.make} ${booking.car.model}` : 'vehicle'}.`;
+                            window.open(`https://wa.me/919876543210?text=${encodeURIComponent(text)}`, '_blank');
+                        }}
+                        className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition cursor-pointer"
+                    >
                         <Clock className="h-6 w-6 text-blue-500 mb-2" />
                         <span className="text-sm font-bold">Extend Trip</span>
                     </button>
-                    <button className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition">
+                    <button 
+                        onClick={() => window.open('tel:+919876543210', '_self')}
+                        className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition cursor-pointer"
+                    >
                         <Phone className="h-6 w-6 text-green-500 mb-2" />
                         <span className="text-sm font-bold">Call Support</span>
                     </button>
-                    <button className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition">
+                    <button className="bg-zinc-800 hover:bg-zinc-700 border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center text-center transition cursor-pointer">
                         <ShieldCheck className="h-6 w-6 text-purple-500 mb-2" />
                         <span className="text-sm font-bold">Insurance</span>
                     </button>
