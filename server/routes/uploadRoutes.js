@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { upload, uploadToCloudinary } = require('../middleware/uploadMiddleware');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 
-router.post('/', protect, admin, upload.single('image'), uploadToCloudinary, (req, res) => {
+router.post('/', protect, authorize(['super_admin', 'admin', 'city_admin', 'office_staff']), upload.single('image'), uploadToCloudinary, (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
